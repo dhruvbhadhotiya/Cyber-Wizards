@@ -144,7 +144,7 @@ const sendButton = document.getElementById('send-message');
 // Function to add a message to chat
 function addMessage(message, isUser = false) {
     const messageDiv = document.createElement('div');
-    messageDiv.className = message ${isUser ? 'user' : 'bot'};
+    messageDiv.className = 'message ${isUser ? 'user' : 'bot'}';
 
     const messageContent = document.createElement('div');
     messageContent.className = 'message-content';
