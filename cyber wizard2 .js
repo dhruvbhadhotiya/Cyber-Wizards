@@ -1,6 +1,7 @@
 // Remove: const axios = require('axios');
 // We'll use a CDN instead - add this to your HTML:
 // <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+// import { GoogleGenAI } from "@google/genai";
 
 document.addEventListener('DOMContentLoaded', () => {
     const chatMessages = document.getElementById('chat-messages');
@@ -9,8 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // For browser, you'll need to set API key differently
     // You could hardcode it (not recommended for production) or use a config
-    const apiKey = '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'; // Replace with your actual key
-    const apiUrl = 'https://api.openai.com/v1/chat/completions';
+    const apiKey = 'AIzaSyCLtGqaK6u86WqM-74cHroI9F0SNYD_8go'; // Replace with your actual key
+    const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey;
+
 
     if (!chatMessages || !userInput || !sendButton) {
         console.error('Required DOM elements are missing');
@@ -40,31 +42,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function getAIResponse(input) {
-        try {
-            if (!apiKey) {
-                throw new Error('API key not configured');
-            }
-
-            const response = await axios.post(apiUrl, {
-                model: 'gpt-3.5-turbo',
-                messages: [
-                    { role: 'system', content: 'You are a helpful assistant.' },
-                    { role: 'user', content: input }
-                ],
-                temperature: 0.7,
-                max_tokens: 150
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
+    try {
+        const response = await axios.post(apiUrl, {
+            system_instruction: {
+                role: "system",
+                parts: [
+                    { text: "You are a AI Mental Health Companion and provide Support, Understanding, and Guidance for Mental Well-being." }
+                ]
+            },
+            contents: [
+                {
+                    parts: [
+                        { text: input }
+                    ]
                 }
-            });
-            return response.data.choices[0].message.content;
-        } catch (error) {
-            console.error('API Error:', error.message);
-            return "Sorry, I encountered an error. Please try again later.";
-        }
+            ]
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const aiText = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+        return aiText || "No response from Gemini.";
+    } catch (error) {
+        console.error('API Error:', error.message);
+        return "Sorry, I encountered an error. Please try again later.";
     }
+}
+
 
     async function sendMessage() {
         const message = userInput.value.trim();
